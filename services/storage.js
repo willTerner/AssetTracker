@@ -33,7 +33,7 @@ export const addAsset = async (asset) => {
       id: Date.now().toString(),
       ...asset,
       createdAt: new Date().toISOString(),
-      previousValue: null, // 第一次记录没有上次价值
+      previousValue: null, // 第一次记录没有上次价值,
     };
     assets.push(newAsset);
     await saveAssets(assets);

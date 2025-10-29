@@ -14,17 +14,23 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "djfijdsifd"
+      "bundleIdentifier": "com.assettracker.app"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "package": "com.assettracker.app",
       "edgeToEdgeEnabled": true
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "3f2d52a9-e53d-4639-a023-f7e6abb8f13c"
+      }
     }
   }
 }

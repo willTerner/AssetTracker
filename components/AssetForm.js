@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -8,12 +8,15 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import RNPickerSelect from 'react-native-picker-select';
 import { CURRENCIES } from '../services/exchangeRate';
+import {DEFAULT_PICKER_PLACEHOLDER} from "./constants";
+import { Platform } from 'react-native';
+import {Picker} from "@react-native-picker/picker";
 
 const AssetForm = ({ navigation, route }) => {
-  const { asset, onSave } = route.params || {};
-  const isEdit = !!asset;
+  const { asset, onSave, type } = route.params || {};
+  const isEdit = !!asset && type === "EDIT";
 
   const [platform, setPlatform] = useState(asset?.platform || '');
   const [value, setValue] = useState(asset?.value?.toString() || '');
@@ -28,6 +31,11 @@ const AssetForm = ({ navigation, route }) => {
     if (!value.trim() || isNaN(parseFloat(value))) {
       Alert.alert('错误', '请输入有效的价值');
       return;
+    }
+
+    if (value === asset.value?.toString()) {
+        navigation.goBack();
+        return;
     }
 
     const assetData = {
@@ -77,16 +85,19 @@ const AssetForm = ({ navigation, route }) => {
         />
 
         <Text style={styles.label}>货币 *</Text>
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={currency}
-            onValueChange={setCurrency}
-          >
-            {CURRENCIES.map((curr) => (
-              <Picker.Item key={curr.value} label={curr.label} value={curr.value} />
-            ))}
-          </Picker>
-        </View>
+
+            {Platform.OS === "ios" ? <Picker selectedValue={currency} onValueChange={setCurrency}>
+                {CURRENCIES.map(item => (<Picker.Item label={item.label} value={item.value} key={item.label}></Picker.Item>))}
+            </Picker>: <View style={styles.pickerContainer}><RNPickerSelect
+                value={currency}
+                onValueChange={setCurrency}
+                items={CURRENCIES}
+                useNativeAndroidPickerStyle
+                placeholder={DEFAULT_PICKER_PLACEHOLDER}
+                disabled={isEdit}
+            >
+            </RNPickerSelect></View>}
+
 
         {valueChange && (
           <View style={styles.changeInfo}>
@@ -148,6 +159,8 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderRadius: 8,
     overflow: 'hidden',
+      paddingHorizontal: 12,
+      paddingVertical: 6
   },
   changeInfo: {
     marginTop: 20,

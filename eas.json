@@ -1,0 +1,30 @@
+{
+  "cli": {
+    "version": ">= 16.25.1",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "ANDROID_SDK_ROOT": "/Users/huchaoqun/Library/Android/sdk"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+       "env": {
+        "ANDROID_SDK_ROOT": "/Users/huchaoqun/Library/Android/sdk"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "env": {
+        "ANDROID_SDK_ROOT": "/Users/huchaoqun/Library/Android/sdk"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

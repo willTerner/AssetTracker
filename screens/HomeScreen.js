@@ -12,6 +12,7 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import { getAssets, addAsset, updateAsset, deleteAsset } from '../services/storage';
 import { convertToCNY } from '../services/exchangeRate';
+import AssetItem from "../components/AssetItem";
 
 const HomeScreen = ({ navigation }) => {
   const [assets, setAssets] = useState([]);
@@ -64,6 +65,7 @@ const HomeScreen = ({ navigation }) => {
         await addAsset(assetData);
         await loadAssets();
       },
+        type: "ADD"
     });
   };
 
@@ -74,6 +76,7 @@ const HomeScreen = ({ navigation }) => {
         await updateAsset(asset.id, assetData);
         await loadAssets();
       },
+        type: "EDIT"
     });
   };
 
@@ -95,42 +98,10 @@ const HomeScreen = ({ navigation }) => {
     );
   };
 
-  const getValueChangeDisplay = (asset) => {
-    if (asset.previousValue !== null && asset.previousValue !== undefined) {
-      const change = asset.value - asset.previousValue;
-      const changePercent = asset.previousValue !== 0 
-        ? ((change / asset.previousValue) * 100).toFixed(2)
-        : 0;
-      const color = change >= 0 ? '#4CAF50' : '#f44336';
+  const renderAssetItem = ({ item }) => {
       return (
-        <Text style={[styles.changeText, { color }]}>
-          {change >= 0 ? '+' : ''}{change.toFixed(2)} ({changePercent >= 0 ? '+' : ''}{changePercent}%)
-        </Text>
-      );
-    }
-    return null;
-  };
-
-  const renderAssetItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.assetItem}
-      onPress={() => handleEditAsset(item)}
-      onLongPress={() => handleDeleteAsset(item)}
-    >
-      <View style={styles.assetHeader}>
-        <Text style={styles.platform}>{item.platform}</Text>
-        <Text style={styles.value}>
-          {item.value.toFixed(2)} {item.currency}
-        </Text>
-      </View>
-      {getValueChangeDisplay(item)}
-      <Text style={styles.date}>
-        {item.updatedAt
-          ? `更新于: ${new Date(item.updatedAt).toLocaleDateString('zh-CN')}`
-          : `创建于: ${new Date(item.createdAt).toLocaleDateString('zh-CN')}`}
-      </Text>
-    </TouchableOpacity>
-  );
+          <AssetItem item={item} onEdit={handleEditAsset} onDelete={handleDeleteAsset}></AssetItem>
+  )};
 
   return (
     <View style={styles.container}>
@@ -196,43 +167,6 @@ const styles = StyleSheet.create({
   },
   listContent: {
     padding: 16,
-  },
-  assetItem: {
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 12,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-  },
-  assetHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  platform: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-    flex: 1,
-  },
-  value: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2196F3',
-  },
-  changeText: {
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  date: {
-    fontSize: 12,
-    color: '#999',
   },
   emptyContainer: {
     alignItems: 'center',

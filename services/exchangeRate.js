@@ -51,7 +51,7 @@ export const convertToCNY = async (amount, currency) => {
     return cnyAmount;
   } catch (e) {
     console.error('Error converting currency:', e);
-    return amount;
+    return null;
   }
 };
 
