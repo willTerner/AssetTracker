@@ -1,12 +1,12 @@
-import React, {useEffect, useState} from "react";
-import {convertToCNY} from "../services/exchangeRate";
-import {Text, TouchableOpacity, View, StyleSheet} from "react-native";
+import React, { useEffect, useState } from 'react';
+import { Text, TouchableOpacity, View, StyleSheet } from 'react-native';
+import { convertToCNY } from '../services/exchangeRate';
 
-export default function AssetItem({item, onEdit, onDelete}) {
-const [cnyValue, setCnyValue] = useState(undefined);
+export default function AssetItem({ item, onEdit, onDelete }) {
+    const [cnyValue, setCnyValue] = useState(undefined);
 
     useEffect(() => {
-        async function calculateCNY()  {
+        async function calculateCNY() {
             const cnyValue = await convertToCNY(item.value, item.currency);
 
             if (cnyValue) {
@@ -15,51 +15,53 @@ const [cnyValue, setCnyValue] = useState(undefined);
         }
 
         calculateCNY();
-    }, []);
+    }, [item.value]);
 
     const getValueChangeDisplay = (asset) => {
         if (asset.previousValue !== null && asset.previousValue !== undefined) {
             const change = asset.value - asset.previousValue;
-            const changePercent = asset.previousValue !== 0
-                ? ((change / asset.previousValue) * 100).toFixed(2)
-                : 0;
+            const changePercent =
+                asset.previousValue !== 0 ? ((change / asset.previousValue) * 100).toFixed(2) : 0;
             const color = change >= 0 ? '#4CAF50' : '#f44336';
             return (
                 <Text style={[styles.changeText, { color }]}>
-                    {change >= 0 ? '+' : ''}{change.toFixed(2)} ({changePercent >= 0 ? '+' : ''}{changePercent}%)
+                    {change >= 0 ? '+' : ''}
+                    {change.toFixed(2)} ({changePercent >= 0 ? '+' : ''}
+                    {changePercent}
+                    %)
                 </Text>
             );
         }
         return null;
     };
 
-        return (
-            <TouchableOpacity
-                style={styles.assetItem}
-                onPress={() => onEdit(item)}
-                onLongPress={() => onDelete(item)}
-            >
-                <View style={styles.assetHeader}>
-                    <Text style={styles.platform}>{item.platform}</Text>
-                    <Text style={styles.value}>
-                        {item.value.toFixed(2)} {item.currency}
+    return (
+        <TouchableOpacity
+            style={styles.assetItem}
+            onPress={() => onEdit(item)}
+            onLongPress={() => onDelete(item)}
+        >
+            <View style={styles.assetHeader}>
+                <Text style={styles.platform}>{item.platform}</Text>
+                <Text style={styles.value}>
+                    {item.value.toFixed(2)} {item.currency}
+                </Text>
+            </View>
+            <View style={styles.secondLineWrap}>
+                <View>
+                    {getValueChangeDisplay(item)}
+                    <Text style={styles.date}>
+                        {item.updatedAt
+                            ? `更新于: ${new Date(item.updatedAt).toLocaleDateString('zh-CN')}`
+                            : `创建于: ${new Date(item.createdAt).toLocaleDateString('zh-CN')}`}
                     </Text>
                 </View>
-                <View style={styles.secondLineWrap}>
-                    <View>
-                        {getValueChangeDisplay(item)}
-                        <Text style={styles.date}>
-                            {item.updatedAt
-                                ? `更新于: ${new Date(item.updatedAt).toLocaleDateString('zh-CN')}`
-                                : `创建于: ${new Date(item.createdAt).toLocaleDateString('zh-CN')}`}
-                        </Text>
-                    </View>
-                    {item.currency !== "CNY" && cnyValue && <Text style={styles.cnyValue}>
-                        {cnyValue.toFixed(2)} {"CNY"}
-                    </Text>}
-                </View>
-            </TouchableOpacity>
-        );
+                {item.currency !== 'CNY' && cnyValue && (
+                    <Text style={styles.cnyValue}>{cnyValue.toFixed(2)} CNY</Text>
+                )}
+            </View>
+        </TouchableOpacity>
+    );
 }
 
 const styles = StyleSheet.create({
@@ -92,8 +94,8 @@ const styles = StyleSheet.create({
         color: '#2196F3',
     },
     secondLineWrap: {
-        flexDirection: "row",
-        justifyContent: "space-between"
+        flexDirection: 'row',
+        justifyContent: 'space-between',
     },
     date: {
         fontSize: 12,
@@ -108,4 +110,4 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         marginBottom: 4,
     },
-})
+});
