@@ -7,21 +7,15 @@
         "development": {
             "developmentClient": true,
             "distribution": "internal",
-            "env": {
-                "ANDROID_SDK_ROOT": "/Users/huchaoqun/Library/Android/sdk"
-            }
+            "environment": "development"
         },
         "preview": {
             "distribution": "internal",
-            "env": {
-                "ANDROID_SDK_ROOT": "/Users/huchaoqun/Library/Android/sdk"
-            }
+            "environment": "preview"
         },
         "production": {
             "autoIncrement": true,
-            "env": {
-                "ANDROID_SDK_ROOT": "/Users/huchaoqun/Library/Android/sdk"
-            }
+            "environment": "production"
         }
     },
     "submit": {
