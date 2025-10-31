@@ -18,6 +18,8 @@ export default function AssetItem({ item, onEdit, onDelete }: AssetItemProps) {
 
       if (calculatedCnyValue) {
         setCnyValue(calculatedCnyValue);
+      } else {
+          setCnyValue(undefined);
       }
     }
 

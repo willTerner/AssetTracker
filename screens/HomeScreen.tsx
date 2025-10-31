@@ -9,11 +9,13 @@ import {
   RefreshControl,
   ActivityIndicator,
   ListRenderItem,
+  Modal,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFocusEffect } from '@react-navigation/native';
 import { getAssets, addAsset, updateAsset, deleteAsset } from '../services/storage';
 import { convertToCNY } from '../services/exchangeRate';
+import { exportAssets, importAssets, ExportFormat } from '../services/importExport';
 import AssetItem from '../components/AssetItem';
 import { RootStackParamList, Asset } from '../types';
 
@@ -24,6 +26,7 @@ function HomeScreen({ navigation }: HomeScreenProps) {
   const [totalCNY, setTotalCNY] = useState(0);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   const loadAssets = async () => {
     try {
@@ -43,7 +46,7 @@ function HomeScreen({ navigation }: HomeScreenProps) {
       for (const asset of assetList) {
         const cnyValue = await convertToCNY(asset.value, asset.currency);
         if (cnyValue) {
-            total += cnyValue;
+          total += cnyValue;
         }
       }
       setTotalCNY(total);
@@ -102,6 +105,18 @@ function HomeScreen({ navigation }: HomeScreenProps) {
     ]);
   };
 
+  const handleImport = async () => {
+    const success = await importAssets();
+    if (success) {
+      await loadAssets();
+    }
+  };
+
+  const handleExport = async (format: ExportFormat) => {
+    setShowExportMenu(false);
+    await exportAssets(format);
+  };
+
   const renderAssetItem: ListRenderItem<Asset> = ({ item }) => (
     <AssetItem item={item} onEdit={handleEditAsset} onDelete={handleDeleteAsset} />
   );
@@ -109,6 +124,17 @@ function HomeScreen({ navigation }: HomeScreenProps) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
+        <View style={styles.headerTop}>
+          <TouchableOpacity style={styles.headerButton} onPress={handleImport}>
+            <Text style={styles.headerButtonText}>导入</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={() => setShowExportMenu(true)}
+          >
+            <Text style={styles.headerButtonText}>导出</Text>
+          </TouchableOpacity>
+        </View>
         <Text style={styles.totalLabel}>总资产 (CNY)</Text>
         {loading ? (
           <ActivityIndicator size="large" color="#2196F3" />
@@ -135,6 +161,49 @@ function HomeScreen({ navigation }: HomeScreenProps) {
       <TouchableOpacity style={styles.fab} onPress={handleAddAsset}>
         <Text style={styles.fabText}>+</Text>
       </TouchableOpacity>
+
+      <Modal
+        visible={showExportMenu}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowExportMenu(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowExportMenu(false)}
+        >
+          <View style={styles.exportMenu}>
+            <Text style={styles.exportMenuTitle}>选择导出格式</Text>
+            <TouchableOpacity
+              style={styles.exportMenuItem}
+              onPress={() => handleExport('json')}
+            >
+              <Text style={styles.exportMenuItemText}>JSON</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.exportMenuItem}
+              onPress={() => handleExport('csv')}
+            >
+              <Text style={styles.exportMenuItemText}>CSV</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.exportMenuItem}
+              onPress={() => handleExport('xlsx')}
+            >
+              <Text style={styles.exportMenuItemText}>Excel (XLSX)</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.exportMenuItem, styles.exportMenuCancel]}
+              onPress={() => setShowExportMenu(false)}
+            >
+              <Text style={[styles.exportMenuItemText, styles.exportMenuCancelText]}>
+                取消
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 }
@@ -148,6 +217,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#2196F3',
     padding: 24,
     alignItems: 'center',
+  },
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    width: '100%',
+    marginBottom: 16,
+    gap: 8,
+  },
+  headerButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  headerButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
   },
   totalLabel: {
     color: '#fff',
@@ -203,6 +290,46 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 32,
     fontWeight: '300',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  exportMenu: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    width: '80%',
+    maxWidth: 300,
+  },
+  exportMenuTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
+    color: '#333',
+  },
+  exportMenuItem: {
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginBottom: 8,
+    backgroundColor: '#2196F3',
+  },
+  exportMenuItemText: {
+    fontSize: 16,
+    textAlign: 'center',
+    color: '#fff',
+    fontWeight: '600',
+  },
+  exportMenuCancel: {
+    backgroundColor: '#f5f5f5',
+    marginTop: 8,
+  },
+  exportMenuCancelText: {
+    color: '#666',
   },
 });
 

@@ -36,7 +36,10 @@ export const getExchangeRates = async (): Promise<ExchangeRates | null> => {
 };
 
 // 将任意货币转换为人民币
-export const convertToCNY = async (amount: number, currency: string): Promise<number | undefined> => {
+export const convertToCNY = async (
+  amount: number,
+  currency: string,
+): Promise<number | undefined> => {
   if (currency === 'CNY') {
     return amount;
   }
@@ -44,7 +47,7 @@ export const convertToCNY = async (amount: number, currency: string): Promise<nu
   try {
     const rates = await getExchangeRates();
     if (!rates || !rates[currency]) {
-      return amount; // 如果获取失败，返回原值
+      return undefined;
     }
 
     // 从CNY到目标货币的汇率，需要反向计算
