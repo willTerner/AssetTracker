@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import * as Sentry from '@sentry/react-native';
 import HomeScreen from './screens/HomeScreen';
 import AssetForm from './components/AssetForm';
 import SetPasswordScreen from './screens/SetPasswordScreen';
@@ -10,9 +11,28 @@ import UnlockScreen from './screens/UnlockScreen';
 import { hasPassword } from './services/passwordStorage';
 import { RootStackParamList } from './types';
 
+Sentry.init({
+  dsn: 'https://b4c4cb5ef356c7021308290fa130b287@o1262612.ingest.us.sentry.io/4510289974657024',
+
+  // Adds more context data to events (IP address, cookies, user, etc.)
+  // For more information, visit: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
+  sendDefaultPii: true,
+
+  // Enable Logs
+  enableLogs: true,
+
+  // Configure Session Replay
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1,
+  integrations: [Sentry.mobileReplayIntegration()],
+
+  // uncomment the line below to enable Spotlight (https://spotlightjs.com)
+  // spotlight: __DEV__,
+});
+
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-export default function App() {
+export default Sentry.wrap(() => {
   const [isLoading, setIsLoading] = useState(true);
   const [passwordExists, setPasswordExists] = useState(false);
   const [isUnlocked, setIsUnlocked] = useState(false);
@@ -88,7 +108,7 @@ export default function App() {
       </Stack.Navigator>
     </NavigationContainer>
   );
-}
+});
 
 const styles = StyleSheet.create({
   loadingContainer: {

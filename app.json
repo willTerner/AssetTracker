@@ -1,36 +1,46 @@
 {
-    "expo": {
-        "name": "多币账本",
-        "slug": "AssetTracker",
-        "version": "1.0.0",
-        "orientation": "portrait",
-        "icon": "./assets/icon.png",
-        "userInterfaceStyle": "light",
-        "newArchEnabled": true,
-        "splash": {
-            "image": "./assets/splash-icon.png",
-            "resizeMode": "cover",
-            "backgroundColor": "#1976D2"
-        },
-        "ios": {
-            "supportsTablet": true,
-            "bundleIdentifier": "com.assettracker.app"
-        },
-        "android": {
-            "adaptiveIcon": {
-                "foregroundImage": "./assets/adaptive-icon.png",
-                "backgroundColor": "#ffffff"
-            },
-            "package": "com.assettracker.app",
-            "edgeToEdgeEnabled": true
-        },
-        "web": {
-            "favicon": "./assets/favicon.png"
-        },
-        "extra": {
-            "eas": {
-                "projectId": "3f2d52a9-e53d-4639-a023-f7e6abb8f13c"
-            }
+  "expo": {
+    "name": "多币账本",
+    "slug": "AssetTracker",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#1976D2"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.assettracker.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.assettracker.app",
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "3f2d52a9-e53d-4639-a023-f7e6abb8f13c"
+      }
+    },
+    "plugins": [
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://sentry.io/",
+          "project": "react-native",
+          "organization": "ternerwillcom"
         }
-    }
+      ]
+    ]
+  }
 }

@@ -43,3 +43,4 @@ yarn-error.*
 android/app/*.keystore
 
 *.apk
+.env.local
