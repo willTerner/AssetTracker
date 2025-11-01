@@ -1,6 +1,6 @@
 {
     "name": "asset-tracker",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "main": "index.js",
     "scripts": {
         "start": "expo start",
@@ -9,6 +9,7 @@
         "web": "expo start --web",
         "build:android": "eas build --platform android --local",
         "build:test:android": "eas build --platform android --local --profile preview",
+        "deploy": "node scripts/deploy.js",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix"
     },
