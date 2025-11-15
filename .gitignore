@@ -44,3 +44,6 @@ android/app/*.keystore
 
 *.apk
 .env.local
+
+localScripts/
+..git
