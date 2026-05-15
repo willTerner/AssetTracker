@@ -47,3 +47,7 @@ android/app/*.keystore
 
 localScripts/
 ..git
+
+.claude
+
+*.aab
