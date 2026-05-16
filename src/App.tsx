@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as Sentry from '@sentry/react-native';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Text, View } from 'react-native';
 import AssetForm from './screens/AssetForm';
 import HomeScreen from './screens/HomeScreen';
 import SetPasswordScreen from './screens/SetPasswordScreen';
@@ -12,6 +12,7 @@ import StatisticsScreen from './screens/StatisticsScreen';
 import UnlockScreen from './screens/UnlockScreen';
 import { hasPassword } from './services/passwordStorage';
 import { RootStackParamList } from './types';
+import { styles } from './App.styles';
 
 Sentry.init({
     dsn: 'https://b4c4cb5ef356c7021308290fa130b287@o1262612.ingest.us.sentry.io/4510289974657024',
@@ -160,13 +161,4 @@ export default Sentry.wrap(() => {
             </Tab.Navigator>
         </NavigationContainer>
     );
-});
-
-const styles = StyleSheet.create({
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#FFFAF3',
-    },
 });

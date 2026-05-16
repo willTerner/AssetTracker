@@ -57,6 +57,12 @@ Initialized in `App.tsx` with Mobile Replay integration, session replay sampling
 - **Metro**: Sentry plugin wrapping the Expo config (`metro.config.js`)
 - **Testing**: No test framework is configured yet. There are no existing tests.
 
+## Code Style
+
+- **Styles separation**: `StyleSheet.create()` must be in a separate `styles.ts` file alongside the component, never inline in component files.
+- **File length limit**: Single files must not exceed 200 lines. When approaching this limit, split into smaller components or extract logic into separate modules (e.g., utility functions, hooks).
+- **Component directory pattern**: Each component lives in its own directory with `index.tsx` and `styles.ts`. Sub-components go in a `components/` subdirectory following the same pattern.
+
 ## Native build
 
 Android builds use EAS (`eas build --platform android --local`). No iOS build pipeline is configured in scripts. The `scripts/deploy.js` handles deployment (invoked via `npm run deploy`).
