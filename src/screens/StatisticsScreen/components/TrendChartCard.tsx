@@ -5,7 +5,7 @@ import { Colors } from '../../../constants';
 import { styles } from '../styles';
 
 interface LineDataItem {
-    value: number;
+    value: number | undefined;
     label: string;
 }
 
@@ -29,7 +29,15 @@ const formatYLabel = (label: string): string => {
     return val.toFixed(0);
 };
 
+const CHART_TARGET_WIDTH = 300;
+const CHART_PADDING = 40;
+
 function TrendChartCard({ lineData, dateFilter, onDateFilterChange }: TrendChartCardProps) {
+    const spacing =
+        lineData.length > 1
+            ? Math.max(1, Math.floor((CHART_TARGET_WIDTH - CHART_PADDING) / (lineData.length - 1)))
+            : 55;
+
     return (
         <View style={styles.card}>
             <Text style={styles.cardTitle}>资产趋势</Text>
@@ -63,7 +71,6 @@ function TrendChartCard({ lineData, dateFilter, onDateFilterChange }: TrendChart
                     <LineChart
                         data={lineData}
                         areaChart
-                        curved
                         color={Colors.coral}
                         startFillColor={Colors.coral}
                         endFillColor={Colors.offWhite}
@@ -73,7 +80,7 @@ function TrendChartCard({ lineData, dateFilter, onDateFilterChange }: TrendChart
                         thickness={2.5}
                         initialSpacing={20}
                         endSpacing={20}
-                        spacing={55}
+                        spacing={spacing}
                         xAxisLabelTextStyle={{
                             color: Colors.warmBrown,
                             fontSize: 9,
@@ -88,6 +95,7 @@ function TrendChartCard({ lineData, dateFilter, onDateFilterChange }: TrendChart
                         noOfSections={3}
                         isAnimated
                         formatYLabel={formatYLabel}
+                        interpolateMissingValues
                     />
                 </View>
             ) : (

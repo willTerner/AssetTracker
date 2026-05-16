@@ -26,7 +26,6 @@ function BarChartCard({ barData }: BarChartCardProps) {
                     barWidth={38}
                     spacing={24}
                     roundedTop
-                    roundedBottom
                     hideRules
                     xAxisColor={Colors.sand}
                     yAxisColor="transparent"

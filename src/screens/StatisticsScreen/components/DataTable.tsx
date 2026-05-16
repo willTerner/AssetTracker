@@ -1,5 +1,5 @@
-import React from 'react';
-import { Text, View } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { Colors } from '../../../constants';
 import { Asset } from '../../../types';
 import { styles } from '../styles';
@@ -17,7 +17,26 @@ interface DataTableProps {
     getValueChange: (asset: Asset) => { change: number; changePercent: string } | null;
 }
 
+type SortOrder = 'asc' | 'desc' | null;
+
 function DataTable({ data, totalCNY, chartColors, getValueChange }: DataTableProps) {
+    const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+
+    const sortedData = useMemo(() => {
+        if (!sortOrder) return data;
+        return [...data].sort((a, b) => {
+            const pctA = totalCNY > 0 ? a.cnyValue / totalCNY : 0;
+            const pctB = totalCNY > 0 ? b.cnyValue / totalCNY : 0;
+            return sortOrder === 'desc' ? pctB - pctA : pctA - pctB;
+        });
+    }, [data, totalCNY, sortOrder]);
+
+    const toggleSort = () => {
+        setSortOrder((prev) => ( prev === 'desc' ? 'asc' : 'desc'));
+    };
+
+    const sortIndicator = sortOrder === 'desc' ? ' ▼' : sortOrder === 'asc' ? ' ▲' : '';
+
     return (
         <View style={styles.card}>
             <Text style={styles.cardTitle}>资产明细</Text>
@@ -25,10 +44,18 @@ function DataTable({ data, totalCNY, chartColors, getValueChange }: DataTablePro
                 <Text style={[styles.tableHeaderCell, styles.colPlatform]}>平台</Text>
                 <Text style={[styles.tableHeaderCell, styles.colValue]}>价值</Text>
                 <Text style={[styles.tableHeaderCell, styles.colCny]}>CNY</Text>
-                <Text style={[styles.tableHeaderCell, styles.colPercent]}>占比</Text>
+                <TouchableOpacity
+                    style={[styles.colPercent, { alignItems: 'flex-end' }]}
+                    onPress={toggleSort}
+                    activeOpacity={0.6}
+                >
+                    <Text style={[styles.tableHeaderCell, { color: sortOrder ? Colors.coral : Colors.warmBrown }]}>
+                        占比{sortIndicator}
+                    </Text>
+                </TouchableOpacity>
                 <Text style={[styles.tableHeaderCell, styles.colChange]}>变化</Text>
             </View>
-            {data.map((item, index) => {
+            {sortedData.map((item, index) => {
                 const percent = totalCNY > 0 ? ((item.cnyValue / totalCNY) * 100).toFixed(1) : '0';
                 const change = getValueChange(item.asset);
                 return (

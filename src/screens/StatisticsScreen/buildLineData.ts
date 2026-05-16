@@ -3,7 +3,7 @@ import { ValueSnapshot } from '../../services/valueHistory';
 export function buildLineData(
     snapshots: ValueSnapshot[],
     dateFilter: 'week' | 'month' | 'year' | 'ytd' | 'all'
-): { value: number; label: string }[] {
+): { value: number | undefined; label: string }[] {
     if (snapshots.length === 0) return [];
 
     const now = new Date();
@@ -29,50 +29,51 @@ export function buildLineData(
             break;
     }
 
+    const sorted = [...snapshots].sort((a, b) => a.date.localeCompare(b.date));
+
+    // snapshots within range
+    const rangeSnaps = sorted.filter((s) => s.date >= startDate && s.date <= today);
+
+    // 5 evenly spaced label dates
     const start = new Date(startDate);
     const end = new Date(today);
-    const rangeDays = Math.ceil((end.getTime() - start.getTime()) / 86400000) + 1;
-    const step = Math.max(1, Math.ceil(rangeDays / 10));
+    const rangeDays = Math.ceil((end.getTime() - start.getTime()) / 86400000);
+    const maxLabels = 5;
+    const labelInterval = rangeDays <= maxLabels - 1 ? 1 : Math.ceil(rangeDays / (maxLabels - 1));
 
-    const sorted = [...snapshots].sort((a, b) => a.date.localeCompare(b.date));
-    const snapVals = sorted.map((s) => s.totalCNY);
-    const snapDates = sorted.map((s) => s.date);
-
-    const getValueAt = (dateStr: string): number => {
-        for (let i = snapDates.length - 1; i >= 0; i -= 1) {
-            if (snapDates[i] <= dateStr) return snapVals[i];
+    const labelDates = new Set<string>();
+    for (let i = 0; i < maxLabels; i += 1) {
+        const d = new Date(start);
+        d.setDate(d.getDate() + i * labelInterval);
+        if (d <= end) {
+            labelDates.add(d.toISOString().slice(0, 10));
         }
-        return 0;
-    };
+    }
+    // ensure today is always included as a label
+    labelDates.add(today);
 
-    const formatLabel = (d: Date): string => {
-        const m = d.getMonth() + 1;
-        const day = d.getDate();
-        const mm = String(m).padStart(2, '0');
-        const dd = String(day).padStart(2, '0');
-        if (step <= 2) return `${mm}/${dd}`;
-        if (step <= 7) return `${mm}/${dd}`;
-        return `${d.getFullYear()}/${mm}`;
-    };
+    // merge: snapshots + label positions, deduped by date
+    const pointMap = new Map<string, { value: number | undefined; isLabel: boolean }>();
 
-    const result: { value: number; label: string }[] = [];
-    const cursor = new Date(start);
-    while (cursor <= end) {
-        const dateStr = cursor.toISOString().slice(0, 10);
-        result.push({
-            value: getValueAt(dateStr),
-            label: formatLabel(cursor),
-        });
-        cursor.setDate(cursor.getDate() + step);
+    for (const d of labelDates) {
+        pointMap.set(d, { value: undefined, isLabel: true });
+    }
+    for (const s of rangeSnaps) {
+        const existing = pointMap.get(s.date);
+        pointMap.set(s.date, { value: s.totalCNY, isLabel: existing?.isLabel ?? false });
     }
 
-    if (result.length > 0 && result[result.length - 1].label !== formatLabel(end)) {
-        const todayStr = end.toISOString().slice(0, 10);
-        result.push({
-            value: getValueAt(todayStr),
-            label: formatLabel(end),
-        });
-    }
+    const entries = [...pointMap.entries()].sort((a, b) => a[0].localeCompare(b[0]));
 
-    return result;
+    const formatLabel = (dateStr: string): string => {
+        const d = new Date(dateStr);
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${m}/${day}`;
+    };
+
+    return entries.map(([dateStr, pt]) => ({
+        value: pt.value,
+        label: pt.isLabel ? formatLabel(dateStr) : '',
+    }));
 }
