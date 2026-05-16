@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import React, { ReactNode, useState } from 'react';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Colors } from '../../constants';
 import { verifyPassword } from '../../services/passwordStorage';
-import { Colors } from '../../components/constants';
 
 interface UnlockScreenProps {
     onUnlock: () => void;
@@ -58,7 +58,7 @@ function UnlockScreen({ onUnlock }: UnlockScreenProps) {
     }, [pin]);
 
     const renderPinDots = () => {
-        const dots = [];
+        const dots: ReactNode[] = [];
         for (let i = 0; i < PIN_LENGTH; i += 1) {
             const filled = i < pin.length;
             dots.push(

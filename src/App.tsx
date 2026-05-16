@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { View, ActivityIndicator, StyleSheet, Text } from 'react-native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import * as Sentry from '@sentry/react-native';
-import HomeScreen from './screens/HomeScreen/HomeScreen';
-import AssetForm from './components/AssetForm';
-import StatisticsScreen from './screens/StatisticsScreen/StatisticsScreen';
-import SetPasswordScreen from './screens/SetPasswordScreen/SetPasswordScreen';
-import UnlockScreen from './screens/UnlockScreen/UnlockScreen';
+import { StatusBar } from 'expo-status-bar';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import AssetForm from './screens/AssetForm';
+import HomeScreen from './screens/HomeScreen';
+import SetPasswordScreen from './screens/SetPasswordScreen';
+import StatisticsScreen from './screens/StatisticsScreen';
+import UnlockScreen from './screens/UnlockScreen';
 import { hasPassword } from './services/passwordStorage';
 import { RootStackParamList } from './types';
 

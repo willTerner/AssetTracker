@@ -1,19 +1,19 @@
-import React, { useState, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import Constants from 'expo-constants';
+import React, { useCallback, useState } from 'react';
 import {
-    View,
-    Text,
+    ActivityIndicator,
     ScrollView,
     StyleSheet,
-    ActivityIndicator,
+    Text,
     TouchableOpacity,
+    View,
 } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
-import { PieChart, BarChart, LineChart } from 'react-native-gifted-charts';
-import Constants from 'expo-constants';
-import { getAssets } from '../../services/storage';
+import { BarChart, LineChart, PieChart } from 'react-native-gifted-charts';
+import { Colors } from '../../constants';
 import { convertToCNY } from '../../services/exchangeRate';
+import { getAssets } from '../../services/storage';
 import { getSnapshots, recordSnapshot, ValueSnapshot } from '../../services/valueHistory';
-import { Colors } from '../../components/constants';
 import { Asset } from '../../types';
 
 const CHART_COLORS = [

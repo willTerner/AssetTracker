@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Text, TouchableOpacity, View, StyleSheet } from 'react-native';
-import { convertToCNY } from '../services/exchangeRate';
-import { Colors } from './constants';
-import { Asset } from '../types';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Colors } from '../../../constants';
+import { convertToCNY } from '../../../services/exchangeRate';
+import { Asset } from '../../../types';
 
 interface AssetItemProps {
     item: Asset;

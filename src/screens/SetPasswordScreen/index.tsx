@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import {
-    View,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    StyleSheet,
     Alert,
     KeyboardAvoidingView,
     Platform,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
+import { Colors } from '../../constants';
 import { setPassword } from '../../services/passwordStorage';
-import { Colors } from '../../components/constants';
 
 interface SetPasswordScreenProps {
     onPasswordSet: () => void;

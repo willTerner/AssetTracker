@@ -1,20 +1,20 @@
+import { Picker } from '@react-native-picker/picker';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
 import {
-    View,
+    Alert,
+    Platform,
+    ScrollView,
+    StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
-    StyleSheet,
-    ScrollView,
-    Alert,
-    Platform,
+    View,
 } from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import RNPickerSelect from 'react-native-picker-select';
-import { Picker } from '@react-native-picker/picker';
-import { CURRENCIES } from '../services/exchangeRate';
-import { DEFAULT_PICKER_PLACEHOLDER, Colors } from './constants';
-import { RootStackParamList } from '../types';
+import { Colors, DEFAULT_PICKER_PLACEHOLDER } from '../../constants';
+import { CURRENCIES } from '../../services/exchangeRate';
+import { RootStackParamList } from '../../types';
 
 type AssetFormProps = NativeStackScreenProps<RootStackParamList, 'AssetForm'>;
 
