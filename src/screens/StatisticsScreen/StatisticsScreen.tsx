@@ -10,11 +10,11 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import { PieChart, BarChart, LineChart } from 'react-native-gifted-charts';
 import Constants from 'expo-constants';
-import { getAssets } from '../services/storage';
-import { convertToCNY } from '../services/exchangeRate';
-import { getSnapshots, recordSnapshot, ValueSnapshot } from '../services/valueHistory';
-import { Colors } from '../components/constants';
-import { Asset } from '../types';
+import { getAssets } from '../../services/storage';
+import { convertToCNY } from '../../services/exchangeRate';
+import { getSnapshots, recordSnapshot, ValueSnapshot } from '../../services/valueHistory';
+import { Colors } from '../../components/constants';
+import { Asset } from '../../types';
 
 const CHART_COLORS = [
     Colors.coral,

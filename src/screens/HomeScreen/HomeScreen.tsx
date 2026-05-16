@@ -15,13 +15,13 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFocusEffect } from '@react-navigation/native';
 
 import Constants from 'expo-constants';
-import { getAssets, addAsset, updateAsset, deleteAsset } from '../services/storage';
-import { convertToCNY } from '../services/exchangeRate';
-import { recordSnapshot } from '../services/valueHistory';
-import { exportAssets, importAssets, ExportFormat } from '../services/importExport';
-import AssetItem from '../components/AssetItem';
-import { Colors } from '../components/constants';
-import { RootStackParamList, Asset } from '../types';
+import { getAssets, addAsset, updateAsset, deleteAsset } from '../../services/storage';
+import { convertToCNY } from '../../services/exchangeRate';
+import { recordSnapshot } from '../../services/valueHistory';
+import { exportAssets, importAssets, ExportFormat } from '../../services/importExport';
+import AssetItem from '../../components/AssetItem';
+import { Colors } from '../../components/constants';
+import { RootStackParamList, Asset } from '../../types';
 
 type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 

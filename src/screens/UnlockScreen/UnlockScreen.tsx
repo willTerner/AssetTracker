@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { verifyPassword } from '../services/passwordStorage';
-import { Colors } from '../components/constants';
+import { verifyPassword } from '../../services/passwordStorage';
+import { Colors } from '../../components/constants';
 
 interface UnlockScreenProps {
     onUnlock: () => void;

@@ -5,11 +5,11 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import * as Sentry from '@sentry/react-native';
-import HomeScreen from './screens/HomeScreen';
+import HomeScreen from './screens/HomeScreen/HomeScreen';
 import AssetForm from './components/AssetForm';
-import StatisticsScreen from './screens/StatisticsScreen';
-import SetPasswordScreen from './screens/SetPasswordScreen';
-import UnlockScreen from './screens/UnlockScreen';
+import StatisticsScreen from './screens/StatisticsScreen/StatisticsScreen';
+import SetPasswordScreen from './screens/SetPasswordScreen/SetPasswordScreen';
+import UnlockScreen from './screens/UnlockScreen/UnlockScreen';
 import { hasPassword } from './services/passwordStorage';
 import { RootStackParamList } from './types';
 

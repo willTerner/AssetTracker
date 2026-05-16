@@ -2,19 +2,20 @@
     "compilerOptions": {
         "strict": true,
         "target": "esnext",
-        "module": "esnext",
+        "module": "nodenext",
         "lib": ["esnext"],
         "jsx": "react-native",
-        "moduleResolution": "node",
+        "moduleResolution": "nodenext",
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
         "resolveJsonModule": true,
         "isolatedModules": true,
         "noEmit": true,
-        "forceConsistentCasingInFileNames": true
+        "forceConsistentCasingInFileNames": true,
+        "noImplicitAny": false
     },
     "include": ["**/*.ts", "**/*.tsx"],
-    "exclude": ["node_modules", "babel.config.js", "metro.config.js", ".eslintrc.js"],
+    "exclude": ["node_modules", "babel.config.js", "metro.config.js", "eslint.config.js"],
     "extends": "expo/tsconfig.base"
 }

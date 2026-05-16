@@ -9,8 +9,8 @@ import {
     KeyboardAvoidingView,
     Platform,
 } from 'react-native';
-import { setPassword } from '../services/passwordStorage';
-import { Colors } from '../components/constants';
+import { setPassword } from '../../services/passwordStorage';
+import { Colors } from '../../components/constants';
 
 interface SetPasswordScreenProps {
     onPasswordSet: () => void;
