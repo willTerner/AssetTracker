@@ -1,7 +1,8 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 import { PieChart } from 'react-native-gifted-charts';
-import { Colors } from '../../../constants';
+import { AppTheme } from '../../../theme/colors';
+import { formatMoney } from '../../../services/exchangeRate';
 import { styles } from '../styles';
 
 interface PieDataItem {
@@ -9,72 +10,101 @@ interface PieDataItem {
     color: string;
     text: string;
 }
+interface StatisticsValueItem {
+    platform: string;
+    displayValue: number;
+}
 
 interface PieChartCardProps {
     pieData: PieDataItem[];
-    totalCNY: number;
-    cnyData: { platform: string; cnyValue: number }[];
+    total: number;
+    currency: string;
+    data: StatisticsValueItem[];
     chartColors: string[];
+    theme: AppTheme;
 }
 
-function renderPieCenter(totalCNY: number) {
-    const displayValue =
-        totalCNY >= 10000
-            ? `${(totalCNY / 10000).toFixed(1)}万`
-            : totalCNY.toFixed(0);
-    return (
-        <View style={styles.pieCenterWrap}>
-            <Text style={styles.pieCenterValue}>¥{displayValue}</Text>
-            <Text style={styles.pieCenterLabel}>总值</Text>
-        </View>
-    );
-}
-
-function PieChartCard({ pieData, totalCNY, cnyData, chartColors }: PieChartCardProps) {
+function PieChartCard({ pieData, total, currency, data, chartColors, theme }: PieChartCardProps) {
     if (pieData.length === 0) return null;
-
     return (
-        <View style={styles.card}>
-            <Text style={styles.cardTitle}>资产占比</Text>
+        <View style={[styles.card, { backgroundColor: theme.surface, borderColor: theme.outline }]}>
+            <Text style={[styles.cardTitle, { color: theme.text }]}>资产构成</Text>
             <View style={styles.chartContainer}>
                 <PieChart
                     data={pieData}
                     donut
                     showTooltip
                     focusOnPress
-                    textColor={Colors.espresso}
+                    textColor={theme.text}
                     tooltipBackgroundColor="transparent"
-                    radius={110}
-                    innerRadius={55}
-                    /* eslint-disable-next-line react/no-unstable-nested-components */
-                    centerLabelComponent={() => renderPieCenter(totalCNY)}
-                    /* eslint-disable-next-line react/no-unstable-nested-components */
+                    radius={92}
+                    innerRadius={58}
+                    centerLabelComponent={() => (
+                        <View style={styles.pieCenterWrap}>
+                            <Text style={[styles.pieCenterValue, { color: theme.text }]}>
+                                {formatMoney(total, currency, true)}
+                            </Text>
+                            <Text style={[styles.pieCenterLabel, { color: theme.tertiaryText }]}>
+                                总资产
+                            </Text>
+                        </View>
+                    )}
                     tooltipComponent={(index: number) => {
                         const item = pieData[index];
                         if (!item?.text) return null;
+                        const percent = total > 0 ? ((item.value / total) * 100).toFixed(1) : '0.0';
                         return (
-                            <View style={styles.pieTooltip}>
-                                <Text style={styles.pieTooltipText}>{item.text}</Text>
+                            <View
+                                style={[
+                                    styles.pieTooltip,
+                                    { backgroundColor: theme.surfaceStrong },
+                                ]}
+                            >
+                                <Text
+                                    style={[styles.pieTooltipText, { color: theme.text }]}
+                                    numberOfLines={1}
+                                >
+                                    {item.text}
+                                </Text>
+                                <Text
+                                    style={[
+                                        styles.pieTooltipText,
+                                        {
+                                            color: item.color,
+                                            fontSize: 11,
+                                            fontWeight: '700',
+                                            marginTop: 2,
+                                        },
+                                    ]}
+                                >
+                                    {percent}%
+                                </Text>
                             </View>
                         );
                     }}
                 />
             </View>
             <View style={styles.legendContainer}>
-                {cnyData.map((item, index) => {
-                    const percent = totalCNY > 0 ? ((item.cnyValue / totalCNY) * 100).toFixed(1) : '0';
+                {data.map((item, index) => {
+                    const percent =
+                        total > 0 ? ((item.displayValue / total) * 100).toFixed(1) : '0.0';
                     return (
-                        <View key={item.platform} style={styles.legendItem}>
+                        <View key={`${item.platform}-${index}`} style={styles.legendItem}>
                             <View
                                 style={[
                                     styles.legendDot,
                                     { backgroundColor: chartColors[index % chartColors.length] },
                                 ]}
                             />
-                            <Text style={styles.legendText} numberOfLines={1}>
+                            <Text
+                                style={[styles.legendText, { color: theme.secondaryText }]}
+                                numberOfLines={1}
+                            >
                                 {item.platform}
                             </Text>
-                            <Text style={styles.legendPercent}>{percent}%</Text>
+                            <Text style={[styles.legendPercent, { color: theme.text }]}>
+                                {percent}%
+                            </Text>
                         </View>
                     );
                 })}

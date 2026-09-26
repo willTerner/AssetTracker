@@ -1,81 +1,100 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { Colors } from '../../../../constants';
-import { convertToCNY } from '../../../../services/exchangeRate';
-import { Asset } from '../../../../types';
+import { ChevronRight, WalletCards } from 'lucide-react-native';
+import { usePreferences } from '../../../../context/PreferencesContext';
+import { convertCurrency, formatMoney } from '../../../../services/exchangeRate';
+import { Asset, ExchangeRates } from '../../../../types';
 import { styles } from './styles';
 
 interface AssetItemProps {
     item: Asset;
+    displayCurrency: string;
+    rates: ExchangeRates | null;
     onEdit: (asset: Asset) => void;
     onDelete: (asset: Asset) => void;
 }
 
-export default function AssetItem({ item, onEdit, onDelete }: AssetItemProps) {
-    const [cnyValue, setCnyValue] = useState<number | undefined>(undefined);
-
-    useEffect(() => {
-        async function calculateCNY() {
-            const cny = await convertToCNY(item.value, item.currency);
-            if (cny) {
-                setCnyValue(cny);
-            } else {
-                setCnyValue(undefined);
-            }
-        }
-        calculateCNY();
-    }, [item.value, item.currency]);
-
-    const getValueChangeDisplay = (asset: Asset) => {
-        if (asset.previousValue !== null && asset.previousValue !== undefined) {
-            const change = asset.value - asset.previousValue;
-            const changePercent =
-                asset.previousValue !== 0
-                    ? ((change / asset.previousValue) * 100).toFixed(2)
-                    : '0';
-            const isPositive = change >= 0;
-            const color = isPositive ? Colors.sage : Colors.coralDark;
-            return (
-                <Text style={[styles.changeText, { color }]}>
-                    {isPositive ? '+' : ''}
-                    {change.toFixed(2)} ({Number(changePercent) >= 0 ? '+' : ''}
-                    {changePercent}%)
-                </Text>
-            );
-        }
-        return null;
-    };
-
-    const borderColor = item.platform.length % 2 === 0 ? Colors.coral : Colors.honey;
+export default function AssetItem({
+    item,
+    displayCurrency,
+    rates,
+    onEdit,
+    onDelete,
+}: AssetItemProps) {
+    const { theme } = usePreferences();
+    const convertedValue = useMemo(
+        () => convertCurrency(item.value, item.currency, displayCurrency, rates),
+        [displayCurrency, item.currency, item.value, rates]
+    );
+    const change = item.previousValue === null ? null : item.value - item.previousValue;
+    const changePercent =
+        change !== null && item.previousValue
+            ? ((change / item.previousValue) * 100).toFixed(1)
+            : null;
 
     return (
         <TouchableOpacity
-            style={[styles.assetItem, { borderLeftColor: borderColor }]}
+            accessibilityRole="button"
+            accessibilityLabel={`${item.platform}, ${formatMoney(item.value, item.currency)}`}
+            accessibilityHint="轻触编辑，长按删除"
+            activeOpacity={0.76}
             onPress={() => onEdit(item)}
             onLongPress={() => onDelete(item)}
-            activeOpacity={0.7}
+            style={[
+                styles.card,
+                {
+                    backgroundColor: theme.surface,
+                    borderColor: theme.outline,
+                    shadowColor: theme.shadow,
+                },
+            ]}
         >
-            <View style={styles.topRow}>
-                <Text style={styles.platform} numberOfLines={1}>
+            <View style={[styles.iconWrap, { backgroundColor: theme.blueSoft }]}>
+                <WalletCards color={theme.blue} size={22} />
+            </View>
+            <View style={styles.copy}>
+                <Text style={[styles.platform, { color: theme.text }]} numberOfLines={1}>
                     {item.platform}
                 </Text>
-                <Text style={styles.value}>
-                    {item.value.toFixed(2)} {item.currency}
+                <Text style={[styles.meta, { color: theme.secondaryText }]} numberOfLines={1}>
+                    {item.currency}
+                    {item.updatedAt
+                        ? ` · 更新于 ${new Date(item.updatedAt).toLocaleDateString('zh-CN')}`
+                        : ''}
                 </Text>
             </View>
-            <View style={styles.bottomRow}>
-                <View style={styles.bottomLeft}>
-                    {getValueChangeDisplay(item)}
-                    <Text style={styles.date}>
-                        {item.updatedAt
-                            ? `更新于: ${new Date(item.updatedAt).toLocaleDateString('zh-CN')}`
-                            : `创建于: ${new Date(item.createdAt).toLocaleDateString('zh-CN')}`}
+            <View style={styles.amountWrap}>
+                <Text
+                    style={[styles.amount, { color: theme.text }]}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                >
+                    {formatMoney(item.value, item.currency)}
+                </Text>
+                {displayCurrency !== item.currency && (
+                    <Text
+                        style={[styles.converted, { color: theme.secondaryText }]}
+                        numberOfLines={1}
+                    >
+                        {convertedValue === undefined
+                            ? '暂无法换算'
+                            : `≈ ${formatMoney(convertedValue, displayCurrency)}`}
                     </Text>
-                </View>
-                {item.currency !== 'CNY' && cnyValue && (
-                    <Text style={styles.cnyValue}>≈ {cnyValue.toFixed(2)} CNY</Text>
+                )}
+                {change !== null && (
+                    <Text
+                        style={[styles.change, { color: change >= 0 ? theme.green : theme.danger }]}
+                        numberOfLines={1}
+                    >
+                        {change >= 0 ? '+' : ''}
+                        {formatMoney(change, item.currency)}
+                        {changePercent
+                            ? ` (${Number(changePercent) >= 0 ? '+' : ''}${changePercent}%)`
+                            : ''}
+                    </Text>
                 )}
             </View>
+            <ChevronRight color={theme.tertiaryText} size={16} />
         </TouchableOpacity>
     );
 }

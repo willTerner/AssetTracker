@@ -1,111 +1,29 @@
 import { StyleSheet } from 'react-native';
-import { Colors } from '../../constants';
 
 export const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: Colors.offWhite,
-    },
-    form: {
-        padding: 20,
-    },
-    label: {
-        fontSize: 13,
-        fontWeight: '600',
-        color: Colors.espresso,
-        marginBottom: 6,
-        marginTop: 16,
-    },
-    input: {
-        backgroundColor: Colors.white,
-        borderWidth: 1.5,
-        borderColor: Colors.sand,
-        borderRadius: 12,
-        padding: 14,
-        fontSize: 15,
-        color: Colors.espresso,
-    },
-    pickerWrapper: {
-        backgroundColor: Colors.white,
-        borderWidth: 1.5,
-        borderColor: Colors.sand,
-        borderRadius: 12,
-        overflow: 'hidden',
-        paddingHorizontal: 6,
-        paddingVertical: 2,
-    },
-    changeInfo: {
-        marginTop: 20,
-        padding: 14,
-        backgroundColor: '#FFF0E5',
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: Colors.sand,
-        borderStyle: 'dashed',
-    },
-    changeLabel: {
-        fontSize: 11,
-        color: Colors.warmBrown,
-        marginBottom: 6,
-    },
-    changeValue: {
-        fontSize: 17,
-        fontWeight: '700',
-    },
-    positive: {
-        color: Colors.sage,
-    },
-    negative: {
-        color: Colors.coralDark,
-    },
-    saveButton: {
-        backgroundColor: Colors.coral,
-        padding: 16,
-        borderRadius: 14,
-        alignItems: 'center',
-        marginTop: 28,
-        shadowColor: Colors.coral,
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.3,
-        shadowRadius: 20,
-        elevation: 6,
-    },
-    saveButtonText: {
-        color: Colors.white,
-        fontSize: 16,
-        fontWeight: '700',
-    },
-    cancelButton: {
-        padding: 14,
-        borderRadius: 12,
-        alignItems: 'center',
-        marginTop: 10,
-    },
-    cancelButtonText: {
-        color: Colors.warmBrown,
-        fontSize: 15,
-        fontWeight: '600',
-    },
+    screen: { flex: 1 },
+    content: { flexGrow: 1, paddingHorizontal: 16, overflow: 'hidden' },
+    ambientBlue: { position: 'absolute', top: 80, left: -68, width: 170, height: 170, borderRadius: 85, opacity: 0.62 },
+    ambientPurple: { position: 'absolute', top: -32, right: -48, width: 145, height: 145, borderRadius: 73, opacity: 0.58 },
+    topBar: { height: 59, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 13 },
+    backButton: { width: 39, height: 39, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+    topBarTitle: { fontSize: 15, fontWeight: '700' },
+    topBarSpacer: { width: 39 },
+    formCard: { padding: 20, borderRadius: 25, borderWidth: 1, shadowColor: '#2D4C7A1F', shadowOffset: { width: 0, height: 11 }, shadowOpacity: 0.35, shadowRadius: 20, elevation: 4 },
+    formIcon: { width: 44, height: 44, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
+    heading: { marginTop: 13, fontSize: 21, fontWeight: '800' },
+    subheading: { marginTop: 5, marginBottom: 19, fontSize: 11, lineHeight: 17 },
+    label: { marginBottom: 7, fontSize: 11, fontWeight: '700' },
+    input: { height: 49, borderWidth: 1, borderRadius: 14, paddingHorizontal: 13, fontSize: 13, marginBottom: 17 },
+    amountLabelRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+    changePreview: { fontSize: 10, fontWeight: '600', marginBottom: 7 },
+    amountInputWrap: { height: 54, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 13, borderWidth: 1, borderRadius: 14, marginBottom: 17 },
+    amountInput: { flex: 1, height: 54, fontSize: 18, fontWeight: '700' },
+    currencyCode: { fontSize: 12, fontWeight: '700' },
+    currencyField: { minHeight: 49, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 13, borderWidth: 1, borderRadius: 14 },
+    currencyText: { fontSize: 13, fontWeight: '600' },
+    saveButton: { height: 51, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: 15, marginTop: 25 },
+    saveButtonText: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
+    privacyNote: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5, marginTop: 14 },
+    privacyText: { fontSize: 9 },
 });
-
-export const pickerSelectStyles = {
-    inputIOS: {
-        fontSize: 15,
-        color: Colors.espresso,
-        paddingVertical: 14,
-        paddingHorizontal: 14,
-    },
-    inputAndroid: {
-        fontSize: 15,
-        color: Colors.espresso,
-        paddingVertical: 14,
-        paddingHorizontal: 14,
-    },
-    placeholder: {
-        color: Colors.warmBrown,
-    },
-    iconContainer: {
-        top: 14,
-        right: 14,
-    },
-};

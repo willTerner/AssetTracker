@@ -1,110 +1,111 @@
 import React from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { LineChart } from 'react-native-gifted-charts';
-import { Colors } from '../../../constants';
+import { AppTheme } from '../../../theme/colors';
+import { formatMoney } from '../../../services/exchangeRate';
 import { styles } from '../styles';
 
-interface LineDataItem {
-    value: number | undefined;
-    label: string;
-}
-
+type DateFilter = 'week' | 'month' | 'quarter' | 'year' | 'ytd' | 'all';
+interface LineDataItem { value: number | undefined; label: string }
 interface TrendChartCardProps {
     lineData: LineDataItem[];
-    dateFilter: string;
-    onDateFilterChange: (filter: 'week' | 'month' | 'year' | 'ytd' | 'all') => void;
+    dateFilter: DateFilter;
+    onDateFilterChange: (filter: DateFilter) => void;
+    currency: string;
+    theme: AppTheme;
+    unavailableMessage?: string;
+    showFilters?: boolean;
 }
 
-const DATE_FILTERS = [
-    { key: 'week' as const, label: '近一周' },
-    { key: 'month' as const, label: '近一月' },
-    { key: 'year' as const, label: '近一年' },
-    { key: 'ytd' as const, label: '年初至今' },
-    { key: 'all' as const, label: '全部' },
+const DATE_FILTERS: Array<{ key: DateFilter; label: string }> = [
+    { key: 'week', label: '周' },
+    { key: 'month', label: '月' },
+    { key: 'quarter', label: '季' },
+    { key: 'year', label: '年' },
+    { key: 'ytd', label: '今年' },
+    { key: 'all', label: '全部' },
 ];
+const CHART_TARGET_WIDTH = 330;
+const CHART_PADDING = 48;
 
-const formatYLabel = (label: string): string => {
-    const val = parseFloat(label);
-    if (val >= 10000) return `${(val / 10000).toFixed(1)}万`;
-    return val.toFixed(0);
-};
-
-const CHART_TARGET_WIDTH = 300;
-const CHART_PADDING = 40;
-
-function TrendChartCard({ lineData, dateFilter, onDateFilterChange }: TrendChartCardProps) {
-    const spacing =
-        lineData.length > 1
-            ? Math.max(1, Math.floor((CHART_TARGET_WIDTH - CHART_PADDING) / (lineData.length - 1)))
-            : 55;
+export default function TrendChartCard({
+    lineData,
+    dateFilter,
+    onDateFilterChange,
+    currency,
+    theme,
+    unavailableMessage,
+    showFilters = true,
+}: TrendChartCardProps) {
+    const spacing = lineData.length > 1
+        ? Math.max(28, Math.floor((CHART_TARGET_WIDTH - CHART_PADDING) / (lineData.length - 1)))
+        : 55;
+    const definedValues = lineData.map((point) => point.value).filter((value): value is number => value !== undefined);
+    let rangeChange: { percent: number; label: string } | null = null;
+    if (definedValues.length >= 2 && definedValues[0] !== 0) {
+        const percent = ((definedValues[definedValues.length - 1] - definedValues[0]) / definedValues[0]) * 100;
+        rangeChange = { percent, label: `${percent >= 0 ? '+' : ''}${percent.toFixed(1)}%` };
+    }
 
     return (
-        <View style={styles.card}>
-            <Text style={styles.cardTitle}>资产趋势</Text>
-            <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.filterRow}
-            >
-                {DATE_FILTERS.map((f) => (
-                    <TouchableOpacity
-                        key={f.key}
-                        style={[
-                            styles.filterChip,
-                            dateFilter === f.key && styles.filterChipActive,
-                        ]}
-                        onPress={() => onDateFilterChange(f.key)}
-                    >
-                        <Text
-                            style={[
-                                styles.filterChipText,
-                                dateFilter === f.key && styles.filterChipTextActive,
-                            ]}
-                        >
-                            {f.label}
-                        </Text>
-                    </TouchableOpacity>
-                ))}
-            </ScrollView>
+        <View style={[styles.card, { backgroundColor: theme.surface, borderColor: theme.outline }]}>
+            <View style={styles.trendHeader}>
+                <Text style={[styles.cardTitle, styles.trendTitle, { color: theme.text }]}>资产趋势</Text>
+                {rangeChange && (
+                    <View style={styles.trendChangeRow}>
+                        <Text style={[styles.trendChangeLabel, { color: theme.tertiaryText }]}>区间变化</Text>
+                        <Text style={[styles.trendChangeValue, { color: rangeChange.percent >= 0 ? theme.green : theme.danger }]}>{rangeChange.label}</Text>
+                    </View>
+                )}
+            </View>
+            {showFilters && (
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
+                    {DATE_FILTERS.map((filter) => {
+                        const active = dateFilter === filter.key;
+                        return (
+                            <TouchableOpacity
+                                key={filter.key}
+                                style={[styles.filterChip, { borderColor: active ? theme.blue : theme.divider, backgroundColor: active ? theme.blue : theme.surfaceStrong }]}
+                                onPress={() => onDateFilterChange(filter.key)}
+                            >
+                                <Text style={[styles.filterChipText, { color: active ? '#FFFFFF' : theme.secondaryText }]}>{filter.label}</Text>
+                            </TouchableOpacity>
+                        );
+                    })}
+                </ScrollView>
+            )}
             {lineData.length >= 2 ? (
-                <View style={styles.chartContainer}>
-                    <LineChart
-                        data={lineData}
-                        areaChart
-                        color={Colors.coral}
-                        startFillColor={Colors.coral}
-                        endFillColor={Colors.offWhite}
-                        startOpacity={0.6}
-                        endOpacity={0.05}
-                        hideDataPoints
-                        thickness={2.5}
-                        initialSpacing={20}
-                        endSpacing={20}
-                        spacing={spacing}
-                        xAxisLabelTextStyle={{
-                            color: Colors.warmBrown,
-                            fontSize: 9,
-                        }}
-                        yAxisTextStyle={{
-                            color: Colors.warmBrown,
-                            fontSize: 10,
-                        }}
-                        xAxisColor={Colors.sand}
-                        yAxisColor="transparent"
-                        hideRules
-                        noOfSections={3}
-                        isAnimated
-                        formatYLabel={formatYLabel}
-                        interpolateMissingValues
-                    />
-                </View>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                    <View style={styles.chartContainer}>
+                        <LineChart
+                            data={lineData}
+                            areaChart
+                            color={theme.blue}
+                            startFillColor={theme.blue}
+                            endFillColor={theme.background}
+                            startOpacity={0.22}
+                            endOpacity={0.015}
+                            hideDataPoints
+                            thickness={2.5}
+                            initialSpacing={17}
+                            endSpacing={20}
+                            spacing={spacing}
+                            xAxisLabelTextStyle={{ color: theme.tertiaryText, fontSize: 9 }}
+                            yAxisTextStyle={{ color: theme.tertiaryText, fontSize: 9 }}
+                            xAxisColor={theme.divider}
+                            yAxisColor="transparent"
+                            hideRules
+                            noOfSections={3}
+                            isAnimated
+                            formatYLabel={(value: string) => formatMoney(Number(value), currency, true)}
+                        />
+                    </View>
+                </ScrollView>
             ) : (
-                <Text style={styles.noDataText}>
-                    数据不足，随时间积累更多数据后显示趋势
+                <Text style={[styles.noDataText, { color: theme.tertiaryText }]}>
+                    {unavailableMessage ?? '数据不足，随时间积累更多记录后显示趋势。'}
                 </Text>
             )}
         </View>
     );
 }
-
-export default TrendChartCard;

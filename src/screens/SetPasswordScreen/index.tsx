@@ -1,106 +1,131 @@
 import React, { useState } from 'react';
-import {
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
-} from 'react-native';
-import { Colors } from '../../constants';
-import { setPassword } from '../../services/passwordStorage';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { LockKeyhole, WalletCards } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { usePreferences } from '../../context/PreferencesContext';
 import { styles } from './styles';
 
 interface SetPasswordScreenProps {
-    onPasswordSet: () => void;
+    mode: 'initial' | 'migration';
+    onComplete: (pin: string) => Promise<void>;
 }
 
-function SetPasswordScreen({ onPasswordSet }: SetPasswordScreenProps) {
-    const [password, setPasswordInput] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
+export default function SetPasswordScreen({ mode, onComplete }: SetPasswordScreenProps) {
+    const { theme } = usePreferences();
+    const insets = useSafeAreaInsets();
+    const [pin, setPin] = useState('');
+    const [confirmPin, setConfirmPin] = useState('');
+    const [saving, setSaving] = useState(false);
+    const isMigration = mode === 'migration';
 
-    const handleSetPassword = async () => {
-        if (!password) {
-            Alert.alert('错误', '请输入密码');
+    const submit = async () => {
+        if (!/^\d{6}$/.test(pin)) {
+            Alert.alert('密码格式不正确', '请设置 6 位数字 PIN。');
             return;
         }
-        if (password.length < 4) {
-            Alert.alert('错误', '密码至少需要4位数字');
-            return;
-        }
-        if (!/^\d+$/.test(password)) {
-            Alert.alert('错误', '密码只能包含数字');
-            return;
-        }
-        if (password !== confirmPassword) {
-            Alert.alert('错误', '两次输入的密码不一致');
+        if (pin !== confirmPin) {
+            Alert.alert('PIN 不一致', '两次输入的 PIN 不相同，请重新确认。');
             return;
         }
 
-        const success = await setPassword(password);
-        if (success) {
-            Alert.alert('成功', '密码设置成功', [
-                { text: '确定', onPress: () => onPasswordSet() },
-            ]);
-        } else {
-            Alert.alert('错误', '密码设置失败，请重试');
+        setSaving(true);
+        try {
+            await onComplete(pin);
+        } catch (error) {
+            Alert.alert('保存失败', (error as Error).message || '请稍后重试。');
+        } finally {
+            setSaving(false);
         }
     };
 
     return (
         <KeyboardAvoidingView
-            style={styles.container}
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={[styles.root, { backgroundColor: theme.background }]}
+            behavior={Platform.OS === 'android' ? 'height' : 'padding'}
         >
-            <View style={styles.content}>
-                <View style={styles.iconContainer}>
-                    <View style={styles.iconInner}>
-                        <Text style={styles.iconText}>¥</Text>
+            <ScrollView
+                contentContainerStyle={[styles.content, { paddingTop: Math.max(insets.top, 28), paddingBottom: Math.max(insets.bottom, 24) }]}
+                keyboardShouldPersistTaps="handled"
+            >
+                <View style={[styles.ambientBlue, { backgroundColor: theme.blueSoft }]} />
+                <View style={[styles.ambientPurple, { backgroundColor: theme.purpleSoft }]} />
+                <View style={[styles.brandMark, { backgroundColor: theme.blue }]}>
+                    <WalletCards color="#FFFFFF" size={28} strokeWidth={1.9} />
+                </View>
+                <View style={[styles.card, { backgroundColor: theme.surfaceStrong, borderColor: theme.outline }]}>
+                    <View style={[styles.lockBadge, { backgroundColor: theme.blueSoft }]}>
+                        <LockKeyhole color={theme.blue} size={18} />
                     </View>
-                </View>
-
-                <Text style={styles.title}>设置密码</Text>
-                <Text style={styles.subtitle}>请设置数字密码以保护您的资产信息</Text>
-
-                <View style={styles.inputContainer}>
-                    <Text style={styles.label}>输入密码（4位以上数字）</Text>
-                    <TextInput
-                        style={styles.input}
-                        value={password}
-                        onChangeText={setPasswordInput}
-                        keyboardType="number-pad"
-                        secureTextEntry
-                        maxLength={6}
-                        placeholder="请输入密码"
-                        placeholderTextColor={Colors.warmBrown}
+                    <Text style={[styles.title, { color: theme.text }]}>
+                        {isMigration ? '升级账本保护' : '创建你的账本'}
+                    </Text>
+                    <Text style={[styles.subtitle, { color: theme.secondaryText }]}>
+                        {isMigration
+                            ? '旧密码已验证，请设置新的 6 位 PIN 完成加密迁移。'
+                            : '设置一个 6 位数字 PIN，保护你的资产记录。'}
+                    </Text>
+                    <PinField
+                        label="设置 PIN"
+                        value={pin}
+                        onChange={setPin}
+                        placeholder="输入 6 位数字"
+                        theme={theme}
                     />
-                </View>
-
-                <View style={styles.inputContainer}>
-                    <Text style={styles.label}>确认密码</Text>
-                    <TextInput
-                        style={styles.input}
-                        value={confirmPassword}
-                        onChangeText={setConfirmPassword}
-                        keyboardType="number-pad"
-                        secureTextEntry
-                        maxLength={6}
-                        placeholder="请再次输入密码"
-                        placeholderTextColor={Colors.warmBrown}
+                    <PinField
+                        label="再次确认"
+                        value={confirmPin}
+                        onChange={setConfirmPin}
+                        placeholder="再次输入 PIN"
+                        theme={theme}
                     />
+                    <View style={[styles.tip, { backgroundColor: theme.blueSoft }]}>
+                        <LockKeyhole color={theme.blue} size={15} />
+                        <Text style={[styles.tipText, { color: theme.secondaryText }]}>PIN 仅用于本机解锁 · 账本数据本机加密</Text>
+                    </View>
+                    <TouchableOpacity
+                        disabled={saving}
+                        onPress={submit}
+                        style={[styles.primaryButton, { backgroundColor: theme.blue, opacity: saving ? 0.65 : 1 }]}
+                    >
+                        <Text style={styles.primaryButtonText}>{saving ? '正在加密…' : isMigration ? '加密并继续' : '开始使用'}</Text>
+                    </TouchableOpacity>
                 </View>
-
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={handleSetPassword}
-                    activeOpacity={0.8}
-                >
-                    <Text style={styles.buttonText}>确定</Text>
-                </TouchableOpacity>
-            </View>
+            </ScrollView>
         </KeyboardAvoidingView>
     );
 }
 
-export default SetPasswordScreen;
+function PinField({
+    label,
+    value,
+    onChange,
+    placeholder,
+    theme,
+}: {
+    label: string;
+    value: string;
+    onChange: (value: string) => void;
+    placeholder: string;
+    theme: ReturnType<typeof usePreferences>['theme'];
+}) {
+    return (
+        <View style={styles.fieldWrap}>
+            <Text style={[styles.fieldLabel, { color: theme.secondaryText }]}>{label}</Text>
+            <View style={[styles.inputWrap, { backgroundColor: theme.backgroundSoft, borderColor: theme.divider }]}>
+                <LockKeyhole size={17} color={theme.tertiaryText} />
+                <TextInput
+                    value={value}
+                    onChangeText={(text) => onChange(text.replace(/\D/g, '').slice(0, 6))}
+                    placeholder={placeholder}
+                    placeholderTextColor={theme.tertiaryText}
+                    keyboardType="number-pad"
+                    secureTextEntry
+                    maxLength={6}
+                    style={[styles.input, { color: theme.text }]}
+                    accessibilityLabel={label}
+                    textContentType="newPassword"
+                />
+            </View>
+        </View>
+    );
+}

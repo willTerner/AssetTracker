@@ -1,4 +1,3 @@
-// Asset related types
 export interface Asset {
     id: string;
     platform: string;
@@ -15,7 +14,6 @@ export interface AssetData {
     currency: string;
 }
 
-// Currency types
 export interface Currency {
     label: string;
     value: string;
@@ -25,12 +23,19 @@ export interface ExchangeRates {
     [key: string]: number;
 }
 
-// Navigation types
-export type RootStackParamList = {
+export type AssetsStackParamList = {
     Home: undefined;
     AssetForm: {
         asset?: Asset;
-        onSave: (assetData: AssetData) => Promise<void>;
         type: 'ADD' | 'EDIT';
+        defaultCurrency?: string;
     };
+};
+
+export type RootStackParamList = AssetsStackParamList;
+
+export type MainTabParamList = {
+    AssetsTab: undefined;
+    StatisticsTab: undefined;
+    SettingsTab: undefined;
 };
