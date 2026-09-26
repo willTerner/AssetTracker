@@ -11,13 +11,22 @@
         },
         "preview": {
             "distribution": "internal",
-            "environment": "preview"
+            "environment": "preview",
+            "android": {
+                "buildType": "apk"
+            },
+            "env": {
+                "ABI_SPLIT": "true"
+            }
         },
         "production": {
             "autoIncrement": true,
             "environment": "production",
             "android": {
                 "buildType": "apk"
+            },
+            "env": {
+                "ABI_SPLIT": "true"
             }
         }
     },

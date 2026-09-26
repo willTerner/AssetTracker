@@ -43,6 +43,7 @@
       "@sentry/react-native",
       "expo-build-properties",
       "./plugins/gradleTimeoutPlugin",
+      "./plugins/abiSplitPlugin",
       [
         "expo-sqlite",
         {

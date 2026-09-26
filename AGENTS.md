@@ -22,6 +22,15 @@ npm run deploy         # Run scripts/deploy.js
 
 Both `build:android` and `build:test:android` run `scripts/prebuild-check.sh` beforehand, which: (1) enforces npm as the package manager, (2) runs `expo-doctor`, and (3) requires `SENTRY_AUTH_TOKEN` to be set.
 
+### ABI split APKs
+
+Android release builds produce **two per-ABI APKs** (`app-arm64-v8a-release.apk`, `app-armeabi-v7a-release.apk`) instead of one universal APK, to reduce package size. This is driven by:
+
+- `plugins/abiSplitPlugin.js` — a config plugin that appends a Gradle `splits { abi }` block (arm64-v8a + armeabi-v7a, `universalApk false`) to `android/app/build.gradle` during prebuild.
+- `ABI_SPLIT=true` — set in the `preview`/`production` profiles in `eas.json`. Splits are only enabled when this env var is set, so local `expo run:android` debug builds (e.g. on x86_64 emulators) stay universal. Keep `reactNativeArchitectures` in `android/gradle.properties` with all 4 ABIs for the same reason.
+
+Note: `android/` is gitignored (CNG/managed workflow) — EAS re-runs prebuild from the `app.json` plugins on every build, so native build changes must be made via config plugins, not by editing `android/` directly.
+
 ## Architecture
 
 ```
