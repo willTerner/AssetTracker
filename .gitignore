@@ -53,3 +53,5 @@ localScripts/
 *.aab
 
 designs
+
+*.tar.gz
