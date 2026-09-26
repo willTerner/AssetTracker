@@ -44,6 +44,7 @@
       "expo-build-properties",
       "./plugins/gradleTimeoutPlugin",
       "./plugins/abiSplitPlugin",
+      "./plugins/versionCodePlugin",
       [
         "expo-sqlite",
         {
